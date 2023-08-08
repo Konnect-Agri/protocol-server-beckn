@@ -49,32 +49,39 @@ app:
   actions:
     requests:
       search:
-        ttl : "PT5S"
+        ttl : "PT10S"
       init:
-        ttl : "PT5S"
+        ttl : "PT15S"
       select:
-        ttl : "PT5S"
+        ttl : "PT10S"
       confirm:
-        ttl : "PT5S"
+        ttl : "PT10S"
       status:
-        ttl : "PT5S"
+        ttl: "PT10S"
+      update:
+        ttl: "PT10S"
+      track:
+        ttl: "PT10S"
       cancel:
-        ttl : "PT5S"
+        ttl: "PT10S"
     
     responses: 
       on_search:
-        ttl: "PT5S"
-      
+        ttl: "PT10S"
       on_init:
-        ttl: "PT5S"
+        ttl: "PT15S"
       on_select:
-        ttl: "PT5S"
+        ttl: "PT10S"
       on_confirm:
-        ttl: "PT5S"
+        ttl: "PT10S"
       on_status:
-        ttl: "PT5S"
+        ttl: "PT10S"
+      on_update:
+        ttl: "PT10S"
+      on_track:
+        ttl: "PT10S"
       on_cancel:
-        ttl: "PT5S"
+        ttl: "PT10S"
   
   # Mandatory.
   privateKey: "NtNBr1rjJ0cXBqxwhbqNOzWB5SeQynKPssIqAWLlRS5GfL7nVZat4ofek/jJTLoeO177h49vDL55nG2k250Lgg=="
