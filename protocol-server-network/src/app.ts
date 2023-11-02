@@ -19,27 +19,28 @@ app.use(Express.json())
 
 Sentry.init({
     dsn: "https://11b27c6c778d42a396527d42a0ea5428@bugs.samagra.io/6",
-  
+
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
     tracesSampleRate: 1.0,
-  });
+});
 
-const initializeExpress=async(successCallback: Function)=>{
+const initializeExpress = async (successCallback: Function) => {
     const app = Express()
-    
+
     // Middleware for request body conversion to json and raw body creation.
     app.use(Express.json({
-        verify: (req: Request, res: Response, buf: Buffer) => {    
-	res.locals={
+        verify: (req: Request, res: Response, buf: Buffer) => {
+            res.locals = {
                 rawBody: buf.toString()
             }
-        }    
+        },
+        limit: '50mb'
     }))
 
     // Request Logger.
-    app.use('/',async (req:Request, res: Response, next: NextFunction) => {
+    app.use('/', async (req: Request, res: Response, next: NextFunction) => {
         //logger.info(JSON.stringify(req.body));
         next();
     })
@@ -49,18 +50,18 @@ const initializeExpress=async(successCallback: Function)=>{
     app.use('/test', testRouter);
 
     // Requests Routing.
-    const {requestsRouter} = require('./routes/requests.routes');
+    const { requestsRouter } = require('./routes/requests.routes');
     app.use('/', requestsRouter);
 
     // Response Routing.
-    const {responsesRouter} = require('./routes/responses.routes');
+    const { responsesRouter } = require('./routes/responses.routes');
     app.use('/', responsesRouter);
 
     // Error Handler.
-    app.use((err : any, req : Request, res : Response, next : NextFunction) => {
+    app.use((err: any, req: Request, res: Response, next: NextFunction) => {
         console.log(err);
-        if(err instanceof Exception){
-            const errorData ={
+        if (err instanceof Exception) {
+            const errorData = {
                 code: err.code,
                 message: err.message,
                 data: err.errorData,
@@ -68,17 +69,17 @@ const initializeExpress=async(successCallback: Function)=>{
             } as BecknErrorDataType;
             res.status(err.code).json({
                 message: {
-                    ack:{
+                    ack: {
                         status: "NACK"
                     }
                 },
                 error: errorData
             });
         }
-        else{
+        else {
             res.status(err.code || 500).json({
                 message: {
-                    ack:{
+                    ack: {
                         status: "NACK"
                     }
                 },
@@ -89,7 +90,7 @@ const initializeExpress=async(successCallback: Function)=>{
 
     const PORT: number = getConfig().server.port;
     app.listen(PORT, () => {
-        logger.info('Protocol Server started on PORT : '+PORT);
+        logger.info('Protocol Server started on PORT : ' + PORT);
         successCallback();
     })
 }
@@ -99,23 +100,23 @@ const main = async () => {
 
         await ClientUtils.initializeConnection();
         await GatewayUtils.getInstance().initialize();
-        if(getConfig().responseCache.enabled){
+        if (getConfig().responseCache.enabled) {
             await ResponseCache.getInstance().initialize();
         }
         await LookupCache.getInstance().initialize();
         await RequestCache.getInstance().initialize();
 
-        await initializeExpress(()=>{
+        await initializeExpress(() => {
             logger.info("Protocol Server Started Successfully");
-            logger.info("Mode: "+getConfig().app.mode.toLocaleUpperCase());
-            logger.info("Gateway Type: "+getConfig().app.gateway.mode.toLocaleUpperCase().substring(0,1)+getConfig().app.gateway.mode.toLocaleUpperCase().substring(1));
+            logger.info("Mode: " + getConfig().app.mode.toLocaleUpperCase());
+            logger.info("Gateway Type: " + getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) + getConfig().app.gateway.mode.toLocaleUpperCase().substring(1));
         });
 
     } catch (err) {
-        if(err instanceof Exception){
+        if (err instanceof Exception) {
             logger.error(err.toString());
         }
-        else{
+        else {
             logger.error(err);
         }
     }
