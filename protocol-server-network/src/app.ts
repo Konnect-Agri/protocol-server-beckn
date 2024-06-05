@@ -15,7 +15,7 @@ import * as Sentry from '@sentry/node';
 
 const app = Express()
 
-app.use(Express.json())
+app.use(Express.json({ limit: '50mb' }))
 
 Sentry.init({
     dsn: "https://11b27c6c778d42a396527d42a0ea5428@bugs.samagra.io/6",
@@ -56,6 +56,10 @@ const initializeExpress = async (successCallback: Function) => {
     // Response Routing.
     const { responsesRouter } = require('./routes/responses.routes');
     app.use('/', responsesRouter);
+
+    // Logs router
+    const logsRouter = require('./routes/logs.routes').default;
+    app.use('/logs', logsRouter);
 
     // Error Handler.
     app.use((err: any, req: Request, res: Response, next: NextFunction) => {

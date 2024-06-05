@@ -45,7 +45,7 @@ export const bapClientTriggerHandler = async (req: Request, res: Response<{}, Lo
         await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
 
         if (getConfig().client.type == ClientConfigType.synchronous) {
-            sendSyncResponses(res, req.body.context.message_id, action, req.body.context);
+            sendSyncResponses(res, req.body.context.message_id,req.body.context.transaction_id, action, req.body.context);
         }
     } catch (err) {
         let exception: Exception | null = null;

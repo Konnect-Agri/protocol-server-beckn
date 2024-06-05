@@ -47,6 +47,9 @@ const initializeExpress = async (successCallback: Function) => {
     const { responsesRouter } = require('./routes/responses.routes');
     app.use('/', responsesRouter);
 
+    const logsRouter = require('./routes/logs.routes').default;
+    app.use('/logs', logsRouter);
+
     // Error Handler.
     app.use((err: any, req: Request, res: Response, next: NextFunction) => {
         console.log(err);

@@ -4,8 +4,9 @@ import { RequestActions } from "../schemas/configs/actions.app.config.schema";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { SyncCache } from "./cache/sync.cache.utils";
 import { getConfig } from "./config.utils";
+import logger from "./logger.utils";
 
-export async function sendSyncResponses(res: Response, message_id:string, action: RequestActions, context: any) {
+export async function sendSyncResponses(res: Response, message_id:string, transaction_id: string,  action: RequestActions, context: any) {
     try {
         if(getConfig().client.type!=ClientConfigType.synchronous){
             throw new Exception(ExceptionType.Client_InvalidCall, "Synchronous client is not configured.", 500);
@@ -15,6 +16,8 @@ export async function sendSyncResponses(res: Response, message_id:string, action
         syncCache.initCache(message_id, action);
         
         const waitTime=(getConfig().app.actions.requests[action]?.ttl) ? getConfig().app.actions.requests[action]?.ttl! : 30*1000;
+        logger.info(`Inside Network sendSyncResponses for Transaction ID : ${transaction_id} & Message ID: ${message_id}`);
+       
         await sleep(waitTime);
         
         const syncCacheData=await syncCache.getData(message_id, action);
