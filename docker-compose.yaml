@@ -1,85 +1,74 @@
-version: "3"
+version: "3.8"
 
 services:
-  # All the stateless services are not exposed and
-  # are accessed using internal docker network
   mongo_db:
     image: mongo
     restart: unless-stopped
     volumes:
       - ./data/mongo_DB:/data/db
-
-    # ports:
-    #   - "27017:27017"
-    # environment:
-    #   - MONGO_INITDB_ROOT_USERNAME=tvast
-    #   - MONGO_INITDB_ROOT_PASSWORD=password
-    #   - MONGO_INITDB_DATABASE=ps
+    healthcheck:
+      test: echo 'db.stats().ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
   redis_db:
     image: redis:6.2.5-alpine
     restart: unless-stopped
-    # ports:
-    #   - "6389:6379"
     volumes:
       - ./data/redis_DB:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
 
   queue_service:
     image: rabbitmq:3.9.11-management-alpine
     restart: unless-stopped
-    # ports:
-    #   - "5672:5672"
-    #   - "15672:15672"
     environment:
-      AMQP_URL: "amqp://queue_service?connection_attempts=3&retry_delay=5"
-      RABBITMQ_DEFAULT_USERL: guest
-      RABBITMQ_DEFAULT_PASS: guest
-  
+      AMQP_URL: "${AMQP_URL}"
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_DEFAULT_USER}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_DEFAULT_PASS}"
     healthcheck:
-        test: [ "CMD", "nc", "-z", "localhost", "5672" ]
-        interval: 5s
-        timeout: 15s
-        retries: 1
+      test: ["CMD", "nc", "-z", "localhost", "5672"]
+      interval: 5s
+      timeout: 15s
+      retries: 3
 
   protocol-server-client:
-    image: protocol-server-client
     restart: always
     build:
       context: ./protocol-server-client
       dockerfile: ./Dockerfile
     depends_on:
       mongo_db:
-        condition: service_started
+        condition: service_healthy
       redis_db:
-        condition: service_started
+        condition: service_healthy
       queue_service:
         condition: service_healthy
     ports:
       - 5003:5003
     volumes:
-      # Volume created for config file
       - ./protocol-server-client/config:/usr/src/app/config
-        # Volume created to store logs
       - ./logs:/usr/src/app/logs
 
   protocol-server-network:
-    image: protocol-server-network
     restart: always
     build:
       context: ./protocol-server-network
       dockerfile: ./Dockerfile
     depends_on:
       mongo_db:
-        condition: service_started
+        condition: service_healthy
       redis_db:
-        condition: service_started
+        condition: service_healthy
       queue_service:
         condition: service_healthy
-
     ports:
       - 5002:5002
     volumes:
-      # Volume created for config file
       - ./protocol-server-network/config:/usr/src/app/config
-        # Volume created to store logs
       - ./logs:/usr/src/app/logs

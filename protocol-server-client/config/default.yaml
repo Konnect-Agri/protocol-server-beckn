@@ -51,7 +51,7 @@ app:
       search:
         ttl : "PT10S"
       init:
-        ttl : "PT10S"
+        ttl : "PT15S"
       select:
         ttl : "PT10S"
       confirm:
@@ -70,7 +70,7 @@ app:
       on_search:
         ttl: "PT10S"
       on_init:
-        ttl: "PT10S"
+        ttl: "PT15S"
       on_select:
         ttl: "PT10S"
       on_confirm:

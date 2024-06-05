@@ -50,7 +50,6 @@ export async function callNetwork(subscribers: SubscriberDetail[], body: any, ax
         // }
         
         logger.info(`sending request to BG / BPP: ${subscriberURL}`);
-        logger.info(`Request Body: ${JSON.stringify(body)}`);
 
         const response = await makeBecknRequest(subscriberURL, body, axios_config, getConfig().app.httpRetryCount, action);
         if ((response.status == 200) || (response.status == 201) || (response.status == 202) || (response.status == 204)) {
@@ -63,7 +62,6 @@ export async function callNetwork(subscribers: SubscriberDetail[], body: any, ax
         for (let i = 0; i < subscribers.length; i++) {
             logger.info(`Attempt Number: ${i + 1} \nAction : ${action}`);
             logger.info(`sending request to BG / BPP: ${subscribers[i].subscriber_url}`);
-            logger.info(`Request Body: ${JSON.stringify(body)}`);
     
             const response = await makeBecknRequest(subscribers[i].subscriber_url, body, axios_config, getConfig().app.httpRetryCount, action);
             if ((response.status == 200) || (response.status == 201) || (response.status == 202) || (response.status == 204)) {

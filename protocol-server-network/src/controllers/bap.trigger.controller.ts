@@ -42,7 +42,6 @@ export const bapClientTriggerHandler = async (req: Request, res: Response<{}, Lo
         await RequestCache.getInstance().cache(parseRequestCache(req.body.context.transaction_id, req.body.context.message_id, action, res.locals.sender!), getConfig().app.actions.requests[action]?.ttl!);
 
         logger.info('sending message to outbox queue');
-        logger.info(`request: ${JSON.stringify(req.body)}`);
         await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
 
         if (getConfig().client.type == ClientConfigType.synchronous) {
@@ -67,7 +66,6 @@ export const bapClientTriggerSettler = async (message: AmqbLib.ConsumeMessage | 
         logger.info('Protocol Network Server (Client Settler) recieving message from outbox queue');
 
         const requestBody = JSON.parse(message?.content.toString()!);
-        logger.info(`request: ${JSON.stringify(requestBody)}`);
 
         const context = becknContextSchema.parse(requestBody.context);
         const axios_config = await createAuthHeaderConfig(requestBody);

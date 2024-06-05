@@ -5,3 +5,4 @@ protocol-server-network/node_modules/
 protocol-server-client/logs/
 protocol-server-network/logs/
 node_modules
+.env

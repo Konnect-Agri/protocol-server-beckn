@@ -51,27 +51,34 @@ app:
       search:
         ttl : "PT10S"
       init:
-        ttl : "PT10S"
+        ttl : "PT15S"
       select:
         ttl : "PT10S"
       confirm:
         ttl : "PT10S"
       status:
-        ttl : "PT10S"
+        ttl: "PT10S"
+      update:
+        ttl: "PT10S"
+      track:
+        ttl: "PT10S"
       cancel:
-        ttl : "PT10S"
+        ttl: "PT10S"
     
     responses: 
       on_search:
         ttl: "PT10S"
-      
       on_init:
-        ttl: "PT10S"
+        ttl: "PT15S"
       on_select:
         ttl: "PT10S"
       on_confirm:
         ttl: "PT10S"
       on_status:
+        ttl: "PT10S"
+      on_update:
+        ttl: "PT10S"
+      on_track:
         ttl: "PT10S"
       on_cancel:
         ttl: "PT10S"
