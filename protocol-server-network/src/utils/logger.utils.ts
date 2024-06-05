@@ -3,6 +3,7 @@ import "winston-daily-rotate-file";
 import * as MongoDB from "winston-mongodb";
 import express from 'express';
 import { ConsumeMessage } from 'amqplib';
+import { getConfig } from "./config.utils";
 
 const myFormat = winston.format.printf(({ level, message, label, timestamp }) => {
   return `${timestamp} [${label}] ${level}: ${message}`;
@@ -18,6 +19,8 @@ interface MyRequest extends express.Request {
     transaction_id?: string;
   };
 }
+
+const mongoURL = getConfig().responseCache.mongoURL;
 
 const logger = winston.createLogger({
   levels: winston.config.syslog.levels,
@@ -71,7 +74,7 @@ const logger = winston.createLogger({
     }),
     new MongoDB.MongoDB({
       level: 'info',
-      db: 'mongodb://localhost:27017/ps',
+      db: mongoURL as string,
       options: { useUnifiedTopology: true },
       collection: 'logs',
       format: winston.format.combine(
